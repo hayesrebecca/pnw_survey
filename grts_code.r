@@ -32,8 +32,9 @@ Dixie_att <- st_set_geometry(Dixie, NULL)
 Riverside <- FireNames[FireNames$Fire_Name == 'Riverside', ]
 Riverside_att <- st_set_geometry(Riverside, NULL)
 
-Unburned <- FireNames[FireNames$Fire_Name == 'Unburned', ]
-Unburned_att <- st_set_geometry(Unburned, NULL)
+#ignore unbured for now
+#Unburned <- FireNames[FireNames$Fire_Name == 'Unburned', ]
+#Unburned_att <- st_set_geometry(Unburned, NULL)
 
 #do both with age strata and without age strata
 #calculate isolation between classes after grts (a nice histogram or flat, skewed right, not bell shaped!)
@@ -51,7 +52,9 @@ sites2021 <- sf::read_sf("stands2021_points.shp")
 sites2021geo <- st_as_sf(sites2021, coord_sf(geom_sf(geometry)))
 
 #filter out only Sierra Nevada sites 
-legacy2021 <- filter(sites2021geo, Watershed%in%c("W58MoodyMd", "W59Sheepca", "W60Rock", "W61Willow", "W62Poplar"))
+###break up dixie and holiday farm
+## this legacy2021 is just for dixie
+#legacy2021 <- filter(sites2021geo, Watershed%in%c("W58MoodyMd", "W59Sheepca", "W60Rock", "W61Willow", "W62Poplar"))
 
 
 
@@ -62,77 +65,140 @@ Claremont_geo <- st_as_sf(Claremont, coord_sf(geom_sf(geometry)))
 Dixie_geo <- st_as_sf(Dixie, coord_sf(geom_sf(geometry)))
 Holiday_geo <- st_as_sf(Holiday, coord_sf(geom_sf(geometry)))
 Riverside_geo <- st_as_sf(Riverside, coord_sf(geom_sf(geometry)))
-Unburned_geo <- st_as_sf(Unburned, coord_sf(geom_sf(geometry)))
+#Unburned_geo <- st_as_sf(Unburned, coord_sf(geom_sf(geometry)))
 
 
 #1. Design for Beachie; each strata will be unique number from Strata column
 
 
-design <-list(
-  '100' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '101' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '102' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '103' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '104' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '105' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '106' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '107' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '108' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '109' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '172' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '173' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '174' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '175' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '176' = list(panel=c(set1=1), seltype="Equal", over=1),
-  '177' = list(panel=c(set1=1), seltype="Equal", over=1),
-  '178' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '179' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '180' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '181' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '182' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '183' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '184' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '185' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '186' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '22' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '23' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '24' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '246' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '247' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '248' = list(panel=c(set1=1), seltype="Equal", over=1),
-  '249' = list(panel=c(set1=1), seltype="Equal", over=1),
-  '25' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '250' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '251' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '252' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '253' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '254' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '255' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '256' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '26' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '27' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '28' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '29' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '30' = list(panel=c(set1=1), seltype="Equal", over=1),
-  '31' = list(panel=c(set1=1), seltype="Equal", over=1),
-  '32' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '33' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '34' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '35' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '95' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '96' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '97' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '98' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '99' = list(panel=c(set1=1), seltype="Equal", over=1)
+design_beachie <-list(
+  '100' = 2, 
+  '101' = 2, 
+  '102' = 2, 
+  '103' = 2, 
+  '104' = 2, 
+  '105' = 2, 
+  '106' = 2, 
+  '107' = 2, 
+  '108' = 2, 
+  '109' = 2, 
+  '172' = 2, 
+  '173' = 2, 
+  '174' = 2, 
+  '175' = 2, 
+  '176' = 2,
+  '177' = 2,
+  '178' = 2, 
+  '179' = 2, 
+  '180' = 2, 
+  '181' = 2, 
+  '182' = 2, 
+  '183' = 2, 
+  '184' = 2, 
+  '185' = 2, 
+  '186' = 2, 
+  '22' = 2, 
+  '23' = 2, 
+  '24' = 2, 
+  '246' = 2, 
+  '247' = 2, 
+  '248' = 2,
+  '249' = 2,
+  '25' = 2, 
+  '250' = 2, 
+  '251' = 2, 
+  '252' = 2, 
+  '253' = 2, 
+  '254' = 2, 
+  '255' = 2, 
+  '256' = 2, 
+  '26' = 2, 
+  '27' = 2, 
+  '28' = 2, 
+  '29' = 2, 
+  '30' = 2,
+  '31' = 2,
+  '32' = 2, 
+  '33' = 2, 
+  '34' = 2, 
+  '35' = 2, 
+  '95' = 2, 
+  '96' = 2, 
+  '97' = 2, 
+  '98' = 2, 
+  '99' = 2
 )
 
 
 
 
-## GRTS code
-beachie_grts <- grts(sframe = Beachie_geo, 
-                     n_base = unlist(design), #have to unlist  because error :'list' object cannot be coerced to type 'double'
-                     stratum_var='Strata')
 
-#error message: stratum :  Not all stratum values are in sample frame. 
-#HOWEVER, I double checked the design length and the size of the list of strata in the severitymerge file and visually compared all of the numbers but still getting the error....
+## 4-4-2022
+#for claremont (only need 10 so should be simple, only one owner)
+strata_n <- c('46' = 4, '47' = 4, '124' = 4, '125' = 4, '201' = 4, '202' = 4, '267' = 4)
+strat_eqprob <- grts(Claremont_geo, n_base = strata_n, stratum_var = "Strata")
+sp_plot(strat_eqprob, Claremont_geo, key.width = lcm(3), fill=Claremont_geo$Fire_Sev)
+
+#for beachie
+design_beachie <-c(
+  '100' = 2, 
+  '101' = 2, 
+  '102' = 2, 
+  '103' = 2, 
+  '104' = 2, 
+  '105' = 2, 
+  '106' = 2, 
+  '107' = 2, 
+  '108' = 2, 
+  '109' = 2, 
+  '172' = 2, 
+  '173' = 2, 
+  '174' = 2, 
+  '175' = 2, 
+  '176' = 2,
+  '177' = 2,
+  '178' = 2, 
+  '179' = 2, 
+  '180' = 2, 
+  '181' = 2, 
+  '182' = 2, 
+  '183' = 2, 
+  '184' = 2, 
+  '185' = 2, 
+  '186' = 2, 
+  '22' = 2, 
+  '23' = 2, 
+  '24' = 2, 
+  '246' = 2, 
+  '247' = 2, 
+  '248' = 2,
+  '249' = 2,
+  '25' = 2, 
+  '250' = 2, 
+  '251' = 2, 
+  '252' = 2, 
+  '253' = 2, 
+  '254' = 2, 
+  '255' = 2, 
+  '256' = 2, 
+  '26' = 2, 
+  '27' = 2, 
+  '28' = 2, 
+  '29' = 2, 
+  '30' = 2,
+  '31' = 2,
+  '32' = 2, 
+  '33' = 2, 
+  '34' = 2, 
+  '35' = 2, 
+  '95' = 2, 
+  '96' = 2, 
+  '97' = 2, 
+  '98' = 2, 
+  '99' = 2
+)
+beachie_grts <- grts(Beachie_geo, n_base = design_beachie, stratum_var = "Strata")
+sp_plot(beachie_grts, Beachie_geo, key.width = lcm(3))
+
+
+
