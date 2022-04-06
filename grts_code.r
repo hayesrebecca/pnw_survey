@@ -7,7 +7,6 @@ library(spsurvey)
 library(tidyverse)
 library(sf)
 
-setwd("C:/Users/rah10/Dropbox (University of Oregon)/bees_and_fire2022/")
 
 #read in shape file
 FireNames <- sf::read_sf("SeverityMerge_220308")
