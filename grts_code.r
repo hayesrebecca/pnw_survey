@@ -1,4 +1,5 @@
 rm(list=ls())
+set.seed(9)
 ## library(rgdal)
 library(raster)
 library(rgeos)
@@ -7,132 +8,104 @@ library(spsurvey)
 library(tidyverse)
 library(sf)
 
-setwd("C:/Users/rah10/Dropbox (University of Oregon)/bees_and_fire2022/")
+## rebecca
+# setwd("C:/Users/rah10/Dropbox (University of Oregon)/")
+
+setwd("pnw_survey_saved/")
+
+grts.save.dir <- "spatial_data"
+
+source("")
 
 #read in shape file
 FireNames <- sf::read_sf("SeverityMerge_220308")
 
-#make into S4 type (i think we don't need to do this actually)
-#FireNames <- sf::st_read("SeverityMerge_220308")
-
-#filter by each fire
-
-Holiday <- FireNames[FireNames$Fire_Name == 'Holiday' , ]
-Holiday_att <- st_set_geometry(Holiday, NULL)
-
-Beachie <- FireNames[FireNames$Fire_Name == 'Beachie', ]
-Beachie_att <- st_set_geometry(Beachie, NULL)
-
-Claremont <- FireNames[FireNames$Fire_Name == 'Claremont', ]
-Claremont_att <- st_set_geometry(Claremont, NULL)
-
-Dixie <- FireNames[FireNames$Fire_Name == 'Dixie', ]
-Dixie_att <- st_set_geometry(Dixie, NULL)
-
-Riverside <- FireNames[FireNames$Fire_Name == 'Riverside', ]
-Riverside_att <- st_set_geometry(Riverside, NULL)
-
-Unburned <- FireNames[FireNames$Fire_Name == 'Unburned', ]
-Unburned_att <- st_set_geometry(Unburned, NULL)
-
-#do both with age strata and without age strata
-#calculate isolation between classes after grts (a nice histogram or flat, skewed right, not bell shaped!)
-
-
-
-
 #read in the legacy sites from 2021 (converted into points)
 sites2021 <- sf::read_sf("stands2021_points.shp")
 
-#convert shapefile into sf object
-#crs = coordinate frame; use sf::st_transform() to move btwn coordinate frames. 
-#all 2021 shapefiles should be Albers 1983 projection (crs 3310)
-#sites2021geo <- st_as_sf(sites2021, coords = c("x", "y"), crs = 3310)
-sites2021geo <- st_as_sf(sites2021, coord_sf(geom_sf(geometry)))
+#change crs to match Firenames
+sites2021 <- st_transform(sites2021, st_crs(FireNames))
 
-#filter out only Sierra Nevada sites 
-legacy2021 <- filter(sites2021geo, Watershed%in%c("W58MoodyMd", "W59Sheepca", "W60Rock", "W61Willow", "W62Poplar"))
+## get rid of random bad sites with no x y 
+sites2021 <- sites2021[!is.na(sites2021$Watershed),]
+
+## subset sites to the watersheds with in each fire
+holiday_watersheds <- c("W56Johnson", "W57Ritchie", "W55Indian")
+dixie_watersheds <- c("W58MoodyMd", "W59Sheepca", "W62Poplar",  "W60Rock")
+claremont_watersheds <- c("W61Willow")
+beachie_watersheds <- c("")
+riverside_watersheds <- c("")
+
+site_select_grts <- function(all_legacy_sites,  ## all the legancy sites from 2021
+                             watersheds, ## a vector of the watershes in the fire of interest
+                             all_fire_polygons,  ## the giant merged fire polygons 
+                             fire.name, ## fire of interest as a character
+                             design_vector, ##design input for grts vector
+                             save.dir ## director to save
+                             ){
+  ## subset to the correct watershes
+  subset_2021_sites <- all_legacy_sites[all_legacy_sites$Watershed %in% watersheds,]
+  
+  #filter to just include specific fire polygons
+  subset_fire <- all_fire_polygons[all_fire_polygons$Fire_Name == fire.name, ]
+  
+  #run grts
+  strat_eqprob <- grts(subset_fire, 
+                       n_base = design_vector, 
+                       stratum_var = "Strata", 
+                       legacy_sites=subset_2021_sites, 
+                       legacy_stratum_var = 'Watershed',
+                       mindis=1000)
+  
+  #export the site selection to dropbox
+  st_write(strat_eqprob$sites_base,
+           dsn= file.path(save.dir, sprintf("grts_sites/%s.shp", fire.name))
+  )
+
+  return(strat_eqprob)
+
+}
 
 
-
-#convert all fires to sf object
-
-Beachie_geo <- st_as_sf(Beachie, coord_sf(geom_sf(geometry)))
-Claremont_geo <- st_as_sf(Claremont, coord_sf(geom_sf(geometry)))
-Dixie_geo <- st_as_sf(Dixie, coord_sf(geom_sf(geometry)))
-Holiday_geo <- st_as_sf(Holiday, coord_sf(geom_sf(geometry)))
-Riverside_geo <- st_as_sf(Riverside, coord_sf(geom_sf(geometry)))
-Unburned_geo <- st_as_sf(Unburned, coord_sf(geom_sf(geometry)))
+claremont_grts <- site_select_grts(all_legacy_sites = sites2021,
+                             watersheds= claremont_watersheds,
+                             all_fire_polygons = FireNames,
+                             fire.name = "Claremont",
+                             design_vector = claremont_design,
+                             save.dir  = grts.save.dir)
 
 
-#1. Design for Beachie; each strata will be unique number from Strata column
+holiday_grts <- site_select_grts(all_legacy_sites = sites2021,
+                                   watersheds= holiday_watersheds,
+                                   all_fire_polygons = FireNames,
+                                   fire.name = "Holiday",
+                                   design_vector = holiday_design,
+                                   save.dir  = grts.save.dir)
 
 
-design <-list(
-  '100' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '101' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '102' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '103' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '104' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '105' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '106' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '107' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '108' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '109' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '172' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '173' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '174' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '175' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '176' = list(panel=c(set1=1), seltype="Equal", over=1),
-  '177' = list(panel=c(set1=1), seltype="Equal", over=1),
-  '178' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '179' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '180' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '181' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '182' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '183' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '184' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '185' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '186' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '22' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '23' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '24' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '246' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '247' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '248' = list(panel=c(set1=1), seltype="Equal", over=1),
-  '249' = list(panel=c(set1=1), seltype="Equal", over=1),
-  '25' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '250' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '251' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '252' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '253' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '254' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '255' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '256' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '26' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '27' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '28' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '29' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '30' = list(panel=c(set1=1), seltype="Equal", over=1),
-  '31' = list(panel=c(set1=1), seltype="Equal", over=1),
-  '32' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '33' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '34' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '35' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '95' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '96' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '97' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '98' = list(panel=c(set1=1), seltype="Equal", over=1), 
-  '99' = list(panel=c(set1=1), seltype="Equal", over=1)
-)
+dixie_grts <- site_select_grts(all_legacy_sites = sites2021,
+                                 watersheds= holiday_watersheds,
+                                 all_fire_polygons = FireNames,
+                                 fire.name = "Dixie",
+                                 design_vector = dixie_design,
+                                 save.dir  = grts.save.dir)
 
+beachie_grts <- site_select_grts(all_legacy_sites = sites2021,
+                               watersheds= beachie_watersheds,
+                               all_fire_polygons = FireNames,
+                               fire.name = "Beachie",
+                               design_vector = beachie_design,
+                               save.dir  = grts.save.dir)
+
+riverside_grts <- site_select_grts(all_legacy_sites = sites2021,
+                                 watersheds= riverside_watersheds,
+                                 all_fire_polygons = FireNames,
+                                 fire.name = "Riverside",
+                                 design_vector = riverside_design,
+                                 save.dir  = grts.save.dir)
 
 
 
-## GRTS code
-beachie_grts <- grts(sframe = Beachie_geo, 
-                     n_base = unlist(design), #have to unlist  because error :'list' object cannot be coerced to type 'double'
-                     stratum_var='Strata')
 
-#error message: stratum :  Not all stratum values are in sample frame. 
-#HOWEVER, I double checked the design length and the size of the list of strata in the severitymerge file and visually compared all of the numbers but still getting the error....
+
+
