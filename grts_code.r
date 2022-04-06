@@ -22,8 +22,6 @@ FireNames <- sf::read_sf("SeverityMerge_220308")
 #calculate isolation between classes after grts (a nice histogram or flat, skewed right, not bell shaped!)
 
 
-
-
 #read in the legacy sites from 2021 (converted into points)
 sites2021 <- sf::read_sf("stands2021_points.shp")
 
@@ -49,14 +47,18 @@ sites2021geo <- st_as_sf(sites2021, coord_sf(geom_sf(geometry)))
 
 ## 4-4-2022
 #for claremont (only need 10 so should be simple, only one owner)
+
 #filter to just include claremont sites
 Claremont <- FireNames[FireNames$Fire_Name == 'Claremont', ]
-#Claremont_att <- st_set_geometry(Claremont, NULL)
+#change to sf type
 Claremont_geo <- st_as_sf(Claremont, coord_sf(geom_sf(geometry)))
 
-
+#create sample design with each unique id as one strata
 strata_n <- c('46' = 4, '47' = 4, '124' = 4, '125' = 4, '201' = 4, '202' = 4, '267' = 4)
+
+#run grts
 strat_eqprob <- grts(Claremont_geo, n_base = strata_n, stratum_var = "Strata")
+#plot
 sp_plot(strat_eqprob, Claremont_geo, key.width = lcm(3), fill=Claremont_geo$Fire_Sev)
 
 #for beachie
