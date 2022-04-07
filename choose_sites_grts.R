@@ -6,10 +6,10 @@ library(tidyverse)
 library(sf)
 
 ## rebecca
-## setwd("C:/Users/rah10/Dropbox (University of Oregon)/")
+setwd("C:/Users/rah10/Dropbox (University of Oregon)/")
 
 ## Lauren mac pro
-setwd("/Volumes/bombus/Dropbox (University of Oregon)/")
+#setwd("/Volumes/bombus/Dropbox (University of Oregon)/")
 
 ## Jesse
 
@@ -34,8 +34,16 @@ fire_polygons$OWNER[fire_polygons$OWNER == "NoData"] <- NA
 owners <-
     read.csv("spatial_data/NCASI_GIS_2022/2021stands_obscowner.csv")
 
-## match owners by stand to 2021 data
+#csv of legacy fire sev 
+legacy_sev <-
+  read.csv("spatial_data/NCASI_GIS_2022/2021stands_obscowner - 2021stands_obscowner_firesev.csv")
+
+## match owner by stand to 2021 data
 sites2021$OWNER <- owners$OWNER[match(sites2021$Stand,
+                                      owners$Stand)]
+
+## match legacy by stand to 2021 data
+sites2021$FireSev <- legacy_sev$fire_sev[match(sites2021$Stand,
                                       owners$Stand)]
 
 ## change crs to match Firenames
