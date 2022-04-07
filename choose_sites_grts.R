@@ -26,6 +26,18 @@ fire_polygons <- sf::read_sf("spatial_data/FireMerge_Final")
 ## read in the legacy sites from 2021 (already converted into points)
 sites2021 <- sf::read_sf("spatial_data/NCASI_GIS_2022/2021stands_points.shp")
 
+
+## set no data to NA
+fire_polygons$OWNER[fire_polygons$OWNER == "NoData"] <- NA
+
+## csv of owner data
+owners <-
+    read.csv("spatial_data/NCASI_GIS_2022/2021stands_obscowner.csv")
+
+## match owners by stand to 2021 data
+sites2021$OWNER <- owners$OWNER[match(sites2021$Stand,
+                                      owners$Stand)]
+
 ## change crs to match Firenames
 sites2021 <- st_transform(sites2021, st_crs(fire_polygons))
 
