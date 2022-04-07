@@ -21,7 +21,7 @@ source("../pnw_survey/src/grts_design_2022.R")
 source("../pnw_survey/src/site_select_grts.R")
 
 ## read in shape file of the 2020 and other fires in OR and CA
-fire_polygons <- sf::read_sf("spatial_data/SeverityMerge_220308")
+fire_polygons <- sf::read_sf("spatial_data/FireMerge_Final")
 
 ## read in the legacy sites from 2021 (already converted into points)
 sites2021 <- sf::read_sf("spatial_data/NCASI_GIS_2022/2021stands_points.shp")
