@@ -45,7 +45,8 @@ claremont_grts <- site_select_grts(all_legacy_sites = sites2021,
                                    all_fire_polygons = fire_polygons,
                                    fire.name = "Claremont",
                                    design_vector = claremont_design,
-                                   save.dir  = grts.save.dir)
+                                   save.dir  = grts.save.dir,
+                                   caty_list = claremont_caty)
 
 
 holiday_grts <- site_select_grts(all_legacy_sites = sites2021,
@@ -53,7 +54,8 @@ holiday_grts <- site_select_grts(all_legacy_sites = sites2021,
                                  all_fire_polygons = fire_polygons,
                                  fire.name = "Holiday",
                                  design_vector = holiday_design,
-                                 save.dir  = grts.save.dir)
+                                 save.dir  = grts.save.dir,
+                                 caty_list = holiday_caty)
 
 
 dixie_grts <- site_select_grts(all_legacy_sites = sites2021,
@@ -61,20 +63,23 @@ dixie_grts <- site_select_grts(all_legacy_sites = sites2021,
                                all_fire_polygons = fire_polygons,
                                fire.name = "Dixie",
                                design_vector = dixie_design,
-                               save.dir  = grts.save.dir)
+                               save.dir  = grts.save.dir,
+                               caty_list = dixie_caty)
 
 beachie_grts <- site_select_grts(all_legacy_sites = sites2021,
                                  watersheds= beachie_watersheds,
                                  all_fire_polygons = fire_polygons,
                                  fire.name = "Beachie",
-                                 design_vector = design_beachie,
-                                 save.dir  = grts.save.dir)
+                                 design_vector = beachie_design,
+                                 save.dir  = grts.save.dir,
+                                 caty_list = beachie_caty)
 
 ## not passing in legacy sites because there were none samples in 2021
 riverside_grts <- site_select_grts(all_fire_polygons = fire_polygons,
                                    fire.name = "Riverside",
                                    design_vector = riverside_design,
-                                   save.dir  = grts.save.dir)
+                                   save.dir  = grts.save.dir,
+                                   caty_list = riverside_caty)
 
 
 
