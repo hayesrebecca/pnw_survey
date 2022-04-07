@@ -4,7 +4,8 @@ site_select_grts <- function(all_legacy_sites=NULL,  ## all the legancy sites fr
                              all_fire_polygons,  ## the giant merged fire polygons
                              fire.name, ## fire of interest as a character
                              design_vector, ##design input for grts vector
-                             save.dir ## director to save
+                             save.dir, ## director to save
+                             caty_list ## a list of how many samples should be selected for each owner
                              ){
                                         #filter to just include specific fire polygons
     subset_fire <- all_fire_polygons[all_fire_polygons$FireName == fire.name, ]
@@ -18,16 +19,20 @@ site_select_grts <- function(all_legacy_sites=NULL,  ## all the legancy sites fr
         ## run grts with legacy sites
         strat_eqprob <- grts(subset_fire,
                              n_base = design_vector,
-                             stratum_var = "OBJECTID",
+                             stratum_var = "FireSev",
                              legacy_sites=subset_2021_sites,
                              legacy_stratum_var = 'Watershed',
-                             mindis=1000)
+                             mindis=1000,
+                             caty_n = caty_list,
+                             caty_var = 'OWNER')
     } else{
         ## run grts without legacy sites
         strat_eqprob <- grts(subset_fire,
                              n_base = design_vector,
-                             stratum_var = "OBJECTID",
-                             mindis=1000)
+                             stratum_var = "FireSev",
+                             mindis=1000,
+                             caty_n = caty_list,
+                             caty_var = 'OWNER')
     }
 
     ## export the sites selected
