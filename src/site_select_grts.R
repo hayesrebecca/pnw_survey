@@ -7,7 +7,7 @@ site_select_grts <- function(all_legacy_sites=NULL,  ## all the legancy sites fr
                              save.dir ## director to save
                              ){
                                         #filter to just include specific fire polygons
-    subset_fire <- all_fire_polygons[all_fire_polygons$Fire_Name == fire.name, ]
+    subset_fire <- all_fire_polygons[all_fire_polygons$FireName == fire.name, ]
 
     if(!is.null(all_legacy_sites)){
         print(fire.name)
