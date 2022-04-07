@@ -1,4 +1,5 @@
 
+
 site_select_grts <- function(all_legacy_sites=NULL,  ## all the legancy sites from 2021
                              watersheds=NULL, ## a vector of the watershes in the fire of interest
                              all_fire_polygons,  ## the giant merged fire polygons
