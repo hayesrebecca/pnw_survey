@@ -18,7 +18,7 @@ site_select_grts <- function(all_legacy_sites=NULL,  ## all the legancy sites fr
         ## run grts with legacy sites
         strat_eqprob <- grts(subset_fire,
                              n_base = design_vector,
-                             stratum_var = "Strata",
+                             stratum_var = "OBJECTID",
                              legacy_sites=subset_2021_sites,
                              legacy_stratum_var = 'Watershed',
                              mindis=1000)
@@ -26,7 +26,7 @@ site_select_grts <- function(all_legacy_sites=NULL,  ## all the legancy sites fr
         ## run grts without legacy sites
         strat_eqprob <- grts(subset_fire,
                              n_base = design_vector,
-                             stratum_var = "Strata",
+                             stratum_var = "OBJECTID",
                              mindis=1000)
     }
 
