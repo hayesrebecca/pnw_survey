@@ -67,7 +67,7 @@ beachie_grts <- site_select_grts(all_legacy_sites = sites2021,
                                  watersheds= beachie_watersheds,
                                  all_fire_polygons = fire_polygons,
                                  fire.name = "Beachie",
-                                 design_vector = beachie_design,
+                                 design_vector = design_beachie,
                                  save.dir  = grts.save.dir)
 
 ## not passing in legacy sites because there were none samples in 2021
