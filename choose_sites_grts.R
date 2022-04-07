@@ -38,6 +38,9 @@ owners <-
 sites2021$OWNER <- owners$OWNER[match(sites2021$Stand,
                                       owners$Stand)]
 
+sites2021$FireSev <- owners$FireSev[match(sites2021$Stand,
+                                      owners$Stand)]
+
 ## change crs to match Firenames
 sites2021 <- st_transform(sites2021, st_crs(fire_polygons))
 
