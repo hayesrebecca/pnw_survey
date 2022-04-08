@@ -30,6 +30,10 @@ fire_polygons_diss <- terra:::aggregate(
                                           FireName= fire_polygons_subset$FireName),
                                   FUN=unique, na.rm=TRUE)
 
+
+fire_polygons_diss$FireSevOwner  <- paste0(fire_polygons_diss$FireSev,
+                                          fire_polygons_diss$OWNER)
+
 st_write(fire_polygons_diss,
          dsn="spatial_data/finalSpData/dissolved_owner_sev_polygons.shp")
 
@@ -64,6 +68,11 @@ sites2021 <- st_transform(sites2021, st_crs(fire_polygons))
 sites_grts <- sites2021[!is.na(sites2021$Watershed),]
 sites_grts <- sites_grts[!is.na(sites_grts$OWNER),]
 sites_grts <- sites_grts[!is.na(sites_grts$FireSev),]
+
+
+sites_grts$FireSevOwner  <- paste0(sites_grts$FireSev,
+                                          sites_grts$OWNER)
+
 
 save(sites_grts, file=
                      "spatial_data/finalSpData/grts2021Sites.Rdata")

@@ -30,14 +30,22 @@ claremont_watersheds <- c("W61Willow")
 beachie_watersheds <- c("W50Pine", "W51Molalla")
 ## there are no sites from 2021 in the riverside fire
 
+fire_polygons_diss$FireSevOwner  <- paste0(fire_polygons_diss$FireSev,
+                                           fire_polygons_diss$OWNER)
+
+
+sites_grts$FireSevOwner  <- paste0(sites_grts$FireSev,
+                                   sites_grts$OWNER)
+
+
 
 claremont_grts <- site_select_grts(all_legacy_sites = sites_grts,
                                    watersheds= claremont_watersheds,
                                    all_fire_polygons = fire_polygons_diss,
                                    fire.name = "Claremont",
                                    design_vector = claremont_design,
-                                   save.dir  = grts.save.dir,
-                                   caty_list = claremont_caty)
+                                   save.dir  = grts.save.dir
+                                   )
 
 
 holiday_grts <- site_select_grts(all_legacy_sites = sites_grts,
@@ -45,8 +53,8 @@ holiday_grts <- site_select_grts(all_legacy_sites = sites_grts,
                                  all_fire_polygons = fire_polygons_diss,
                                  fire.name = "Holiday",
                                  design_vector = holiday_design,
-                                 save.dir  = grts.save.dir,
-                                 caty_list = holiday_caty)
+                                 save.dir  = grts.save.dir
+                                 )
 
 
 dixie_grts <- site_select_grts(all_legacy_sites = sites_grts,
@@ -54,25 +62,24 @@ dixie_grts <- site_select_grts(all_legacy_sites = sites_grts,
                                all_fire_polygons = fire_polygons_diss,
                                fire.name = "Dixie",
                                design_vector = dixie_design,
-                               save.dir  = grts.save.dir,
-                               caty_list = dixie_caty)
+                               save.dir  = grts.save.dir
+                               )
 
 beachie_grts <- site_select_grts(all_legacy_sites = sites_grts,
                                  watersheds= beachie_watersheds,
                                  all_fire_polygons = fire_polygons_diss,
                                  fire.name = "Beachie",
                                  design_vector = beachie_design,
-                                 save.dir  = grts.save.dir,
-                                 caty_list = beachie_caty)
+                                 save.dir  = grts.save.dir
+                                 )
 
 ## not passing in legacy sites because there were none samples in 2021
 riverside_grts <- site_select_grts(all_fire_polygons = fire_polygons_diss,
                                    fire.name = "Riverside",
                                    design_vector = riverside_design,
                                    save.dir  = grts.save.dir,
-                                   caty_list = riverside_caty,
                                    all_legacy_sites=NULL,
-                             watersheds=NULL)
+                                   watersheds=NULL)
 
 
 
