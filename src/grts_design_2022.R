@@ -6,17 +6,17 @@ beachie_design <- c( #choose the number of points in each firesev category
 )
 
 beachie_caty <- list( #choose the number of points for each owner, must equal number in design
-  'high' = c('BLM' = 2, 
+  'high' = c('BLM' = 2,
              'E' = 2,
              'M' = 2,
              'State' = 2,
              'USFS' = 2),
-  'med' = c('BLM' = 2, 
+  'med' = c('BLM' = 2,
             'E' = 2,
             'M' = 2,
             'State' = 2,
             'USFS' = 2),
-  'low' = c('BLM' = 2, 
+  'low' = c('BLM' = 2,
             'E' = 2,
             'M' = 2,
             'State' = 2,
@@ -33,12 +33,12 @@ claremont_design <- c( #choose the number of points in each firesev category
 )
 
 claremont_caty <- list( #choose the number of points for each owner, must equal number in design (in legacy some sites are NA for owner)
-  'high' = c('C' = 7,
-             "NA" = 3),
-  'med' = c('C' = 10,
-            "NA" = 0),
-  'low' = c('C' = 8,
-            "NA" = 2)
+    'high' = c('C' = 10,
+               "NoData" = 0),
+    'med' = c('C' = 10,
+              "NoData" = 0),
+    'low' = c('C' = 10,
+              "NoData" = 0)
 )
 
 
@@ -49,17 +49,17 @@ riverside_design <- c( #choose the number of points in each firesev category
 )
 
 riverside_caty <- list( #choose the number of points for each owner, must equal number in design
-  'high' = c('BLM' = 2, 
+  'high' = c('BLM' = 2,
              'E' = 2,
              'M' = 2,
              'State' = 2,
              'USFS' = 2),
-  'med' = c('BLM' = 2, 
+  'med' = c('BLM' = 2,
             'E' = 2,
             'M' = 2,
             'State' = 2,
             'USFS' = 2),
-  'low' = c('BLM' = 2, 
+  'low' = c('BLM' = 2,
             'E' = 2,
             'M' = 2,
             'State' = 2,
@@ -73,19 +73,19 @@ holiday_design <- c( #choose the number of points in each firesev category
 )
 
 holiday_caty <- list( #choose the number of points for each owner, must equal number in design
-  'high' = c('BLM' = 2, 
+  'high' = c('BLM' = 2,
              'T' = 2,
              'M' = 2,
              'U' = 2,
              'State' = 2,
              'USFS' = 2),
-  'med' = c('BLM' = 2, 
+  'med' = c('BLM' = 2,
             'T' = 2,
             'M' = 2,
             'U' = 2,
             'State' = 2,
             'USFS' = 2),
-  'low' = c('BLM' = 2, 
+  'low' = c('BLM' = 2,
             'T' = 2,
             'M' = 2,
             'U' = 2,
