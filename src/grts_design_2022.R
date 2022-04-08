@@ -32,7 +32,7 @@ claremont_design <- c( #choose the number of points in each firesev category
   'low' = 10
 )
 
-claremont_caty <- list( #choose the number of points for each owner, must equal number in design
+claremont_caty <- list( #choose the number of points for each owner, must equal number in design (in legacy some sites are NA for owner)
   'high' = c('C' = 7,
              "NA" = 3),
   'med' = c('C' = 10,
