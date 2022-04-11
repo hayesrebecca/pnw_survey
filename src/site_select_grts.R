@@ -64,6 +64,12 @@ site_select_grts <- function(all_legacy_sites=NULL,  ## all the legancy sites fr
              delete_dsn = TRUE
              )
 
+
+    save(strat_eqprob,
+         file= file.path(save.dir, sprintf("grts_sites/%s.RData",
+                                           fire.name))
+         )
+
     return(strat_eqprob)
 
 }

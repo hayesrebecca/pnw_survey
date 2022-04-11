@@ -94,10 +94,10 @@ holiday_design <- c( #choose the number of points in each firesev category
     'highBLM' = 2,
     'medBLM' = 2,
     'lowBLM' = 2,
-    'highE' = 2,
-    'medE' = 2,
-    'lowE' = 2,
-    'highM' = 2,
+    'highT' = 2,
+    'medT' = 2,
+    'lowT' = 2,
+    'highM' = 4,
     'medM' = 2,
     'lowM' = 2,
     'highSTATE' = 2,
@@ -106,7 +106,7 @@ holiday_design <- c( #choose the number of points in each firesev category
     'highUSFS' = 2,
     'medUSFS' = 2,
     'lowUSFS' = 2,
-    'high' = 2,
+    'highU' = 2,
     'medU' = 2,
     'lowU' = 2
 )
@@ -138,8 +138,8 @@ dixie_design <- c( #choose the number of points in each firesev category
     'medC' = 5,
     'lowC' = 5,
     'highQ' = 5,
-    'medEQ' = 5,
-    'lowEQ' = 5
+    'medQ' = 5,
+    'lowQ' = 5
     )
 
 ## dixie_caty <- list( #choose the number of points for each owner, must equal number in design

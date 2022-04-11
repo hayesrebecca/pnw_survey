@@ -1,11 +1,8 @@
 rm(list=ls())
-set.seed(9)
-library(raster)
+library(terra)
 library(spsurvey)
 library(tidyverse)
 library(sf)
-library(landscapemetrics)
-library(rgeos)
 
 ## rebecca
 ## setwd("C:/Users/rah10/Dropbox (University of Oregon)/")
@@ -13,34 +10,12 @@ library(rgeos)
 ## Lauren mac pro
 setwd("/Volumes/bombus/Dropbox (University of Oregon)/")
 
+## Jesse
+
 setwd("pnw_survey_saved/")
 
-## ## read in shape file of the 2020 and other fires in OR and CA
-fire_raster <-
-    raster("spatial_data/firemerg2.tif/firemerg2.tif")
-
-high_sev_raster <- fire_raster
-high_sev_raster[high_sev_raster < 3]  <- NA
-
-## read in shape file of the 2020 and other fires in OR and CA
-fire_polygons <- sf::read_sf("spatial_data/FireMerge_Final")
-fire_polygons <- st_transform(fire_raster, st_crs(fire_raster))
-
-fire_polygons_subset <- fire_polygons[, c("FireSev")]
-
-high_sev_polygons <- fire_polygons_subset[fire_polygons_subset$FireSev
-                                          == "high",]
-
-## takes a long time and doesn't actually seem to work
-## high_sev_polygons <- terra:::aggregate(high_sev_polygons,
-##                            by=list(high_sev_polygons$FireSev),
-##                                        FUN=mean, na.rm=TRUE)
-
-## read in the legacy sites from 2021 (already converted into points)
-sites2021 <- sf::read_sf("spatial_data/NCASI_GIS_2022/2021stands_points.shp")
-
-## change crs to match
-sites2021 <- st_transform(sites2021, st_crs(fire_raster))
+load(file="spatial_data/finalSpData/firePolygons.Rdata")
+load(file="spatial_data/finalSpData/grts2021Sites.Rdata")
 
 site.ids <- sites2021$Stand
 

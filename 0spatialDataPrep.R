@@ -1,7 +1,6 @@
 rm(list=ls())
 library(terra)
 library(spsurvey)
-library(tidyverse)
 library(sf)
 
 ## rebecca
@@ -18,10 +17,14 @@ setwd("pnw_survey_saved/")
 ## fire polygons: dissolve and clean up
 ## *******************************************************************
 
-fire_polygons <- sf::read_sf("spatial_data/FireMerge_Final")
+fire_polygons <- sf::read_sf("spatial_data/FireMerge_Final_2kmroadclip.shp/FireMerge_Final_2kmroadclip.shp")
+
+fire_polygons$FireSev[fire_polygons$FireSev == "NoData"] <- "unburned"
 
 ## subset to fire sev and owner to facilitate merging
-fire_polygons_subset <- fire_polygons[, c("FireSev", "OWNER", "FireName")]
+fire_polygons_subset <- fire_polygons[, c("FireSev", "OWNER",
+                                          "FireName")]
+
 
 fire_polygons_diss <- terra:::aggregate(
                                   fire_polygons_subset,
@@ -35,7 +38,8 @@ fire_polygons_diss$FireSevOwner  <- paste0(fire_polygons_diss$FireSev,
                                           fire_polygons_diss$OWNER)
 
 st_write(fire_polygons_diss,
-         dsn="spatial_data/finalSpData/dissolved_owner_sev_polygons.shp")
+         dsn="spatial_data/finalSpData/dissolved_owner_sev_polygons.shp",
+          delete_dsn = TRUE)
 
 
 save(fire_polygons, fire_polygons_diss, file=
@@ -61,13 +65,15 @@ sites2021$OWNER <- owners$OWNER[match(sites2021$Stand,
 sites2021$FireSev <- owners$FireSev[match(sites2021$Stand,
                                       owners$Stand)]
 
+sites2021$FireSev[is.na(sites2021$FireSev)]  <-  "unburned"
+
 ## change crs to match Firenames
 sites2021 <- st_transform(sites2021, st_crs(fire_polygons))
 
 ## get rid of random bad sites with no x y
 sites_grts <- sites2021[!is.na(sites2021$Watershed),]
 sites_grts <- sites_grts[!is.na(sites_grts$OWNER),]
-sites_grts <- sites_grts[!is.na(sites_grts$FireSev),]
+## sites_grts <- sites_grts[!is.na(sites_grts$FireSev),]
 
 
 sites_grts$FireSevOwner  <- paste0(sites_grts$FireSev,
@@ -76,6 +82,11 @@ sites_grts$FireSevOwner  <- paste0(sites_grts$FireSev,
 
 save(sites_grts, file=
                      "spatial_data/finalSpData/grts2021Sites.Rdata")
+
+
+save(sites2021, file=
+                     "spatial_data/finalSpData/sites2021.Rdata")
+
 
 ## *******************************************************************
 ## fire raster: subset to high sev

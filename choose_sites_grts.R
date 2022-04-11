@@ -30,15 +30,6 @@ claremont_watersheds <- c("W61Willow")
 beachie_watersheds <- c("W50Pine", "W51Molalla")
 ## there are no sites from 2021 in the riverside fire
 
-fire_polygons_diss$FireSevOwner  <- paste0(fire_polygons_diss$FireSev,
-                                           fire_polygons_diss$OWNER)
-
-
-sites_grts$FireSevOwner  <- paste0(sites_grts$FireSev,
-                                   sites_grts$OWNER)
-
-
-
 claremont_grts <- site_select_grts(all_legacy_sites = sites_grts,
                                    watersheds= claremont_watersheds,
                                    all_fire_polygons = fire_polygons_diss,
