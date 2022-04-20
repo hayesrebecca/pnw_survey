@@ -13,11 +13,13 @@ setwd("/Volumes/bombus/Dropbox (University of Oregon)/")
 
 setwd("pnw_survey_saved/")
 
+public.owners <- c("BLM", "STATE", "USFS")
+
 ## *******************************************************************
 ## fire polygons: dissolve and clean up
 ## *******************************************************************
 
-fire_polygons <- sf::read_sf("spatial_data/FireMerge_Final_2kmroadclip.shp/FireMerge_Final_2kmroadclip.shp")
+fire_polygons <- sf::read_sf("spatial_data/FireMerge_1kmroadbuff.shp/FireMerge_1kmroadbuff.shp")
 
 fire_polygons$FireSev[fire_polygons$FireSev == "NoData"] <- "unburned"
 
@@ -34,8 +36,14 @@ fire_polygons_diss <- terra:::aggregate(
                                   FUN=unique, na.rm=TRUE)
 
 
+## merge public owners
+fire_polygons_diss$OWNER[fire_polygons_diss$OWNER %in% public.owners] <-
+    "PUBLIC"
+
 fire_polygons_diss$FireSevOwner  <- paste0(fire_polygons_diss$FireSev,
-                                          fire_polygons_diss$OWNER)
+                                           fire_polygons_diss$OWNER)
+
+unique(fire_polygons_diss$FireSevOwner)
 
 st_write(fire_polygons_diss,
          dsn="spatial_data/finalSpData/dissolved_owner_sev_polygons.shp",
@@ -51,9 +59,6 @@ save(fire_polygons, fire_polygons_diss, file=
 
 sites2021 <- sf::read_sf("spatial_data/NCASI_GIS_2022/2021stands_points.shp")
 
-## set no data to NA
-fire_polygons$OWNER[fire_polygons$OWNER == "NoData"] <- NA
-
 ## csv of owner data
 owners <-
     read.csv("spatial_data/NCASI_GIS_2022/2021stands_obscowner.csv")
@@ -67,6 +72,9 @@ sites2021$FireSev <- owners$FireSev[match(sites2021$Stand,
 
 sites2021$FireSev[is.na(sites2021$FireSev)]  <-  "unburned"
 
+## convert public land to one owner category
+sites2021$OWNER[sites2021$OWNER %in% public.owners] <- "PUBLIC"
+
 ## change crs to match Firenames
 sites2021 <- st_transform(sites2021, st_crs(fire_polygons))
 
@@ -75,10 +83,10 @@ sites_grts <- sites2021[!is.na(sites2021$Watershed),]
 sites_grts <- sites_grts[!is.na(sites_grts$OWNER),]
 ## sites_grts <- sites_grts[!is.na(sites_grts$FireSev),]
 
-
 sites_grts$FireSevOwner  <- paste0(sites_grts$FireSev,
                                           sites_grts$OWNER)
 
+unique(sites_grts$FireSevOwner)
 
 save(sites_grts, file=
                      "spatial_data/finalSpData/grts2021Sites.Rdata")
@@ -105,3 +113,21 @@ writeRaster(high_sev_raster,
 
 save(high_sev_raster, fire_raster, file=
                      "spatial_data/finalSpData/fireRasters.Rdata")
+
+
+## *******************************************************************
+## fire polygons: subset to high sev
+## *******************************************************************
+
+fire_polygons <- sf::read_sf("spatial_data/FireMerge_Final/FireMerge_Final.shp")
+
+high_sev_polygons <- fire_polygons[fire_polygons$FireSev == "high",]
+
+high_sev_polygons <- terra:::aggregate(
+                                  high_sev_polygons,
+                                  by=list(FireSev=high_sev_polygons$FireSev,
+                                          FireName= high_sev_polygons$FireName),
+                                 FUN=unique, na.rm=TRUE)
+
+save(high_sev_polygons, file=
+                     "spatial_data/finalSpData/high_sev_polygons.Rdata")

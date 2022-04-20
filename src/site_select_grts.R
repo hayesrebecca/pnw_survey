@@ -16,15 +16,22 @@ site_select_grts <- function(all_legacy_sites=NULL,  ## all the legancy sites fr
     ## owner. Subsets to each fire and each fire's legacy sites, then
     ## chooses points based on the design matrix.
 
-    subset_fire <- all_fire_polygons[all_fire_polygons$FireName == fire.name, ]
+    subset_fire <- all_fire_polygons[all_fire_polygons$FireName ==
+                                     fire.name, ]
+
     if(!is.null(all_legacy_sites)){
         print(paste(fire.name, "with legacy sites"))
 
         print(unique(subset_fire$FireSevOwner))
+
         ## subset to the correct watershes
         subset_2021_sites <-
             all_legacy_sites[all_legacy_sites$Watershed %in%
                              watersheds,]
+
+        print("2021 legacy sites")
+        print(table(subset_2021_sites$FireSevOwner))
+
         if(nrow(subset_2021_sites) != 0){
             ## run grts with legacy sites
             strat_eqprob <- grts(subset_fire,

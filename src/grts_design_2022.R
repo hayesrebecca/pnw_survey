@@ -1,152 +1,57 @@
 
-beachie_design <- c( #choose the number of points in each firesev category
-    'highBLM' = 4,
-    'medBLM' = 2,
-    ## 'lowBLM' = 2,
-    'highE' = 4,
+beachie_design <- c( ## target 20 assuming not sampling riverside
+    'highPUBLIC' = 4, ## one extra
+    'medPUBLIC' = 2,
+    'lowPUBLIC' = 2, ## already have
+    'highE' = 2, ## Very little in fire perim, choosing > 2 gets
+    ## points very close to each other
     'medE' = 2,
-    ## 'lowE' = 2,
-    'highM' = 4,
-    'medM' = 2,
-    ## 'lowM' = 2,
-    'highSTATE' = 4,
-    'medSTATE' = 2,
-    ## 'lowSTATE' = 2,
-    'highUSFS' = 4,
-    'medUSFS' = 2
-    ## 'lowUSFS' = 2
+    'lowE' = 2, ## already have
+    'highM' = 4, ## one extra
+    'medM' = 2
+    ## 'unburnedM' = 6 ## already have  => doing just 1
+    ## 'unburnedPUBLIC = 1 doing just 1
 )
 
-## beachie_caty <- list( #choose the number of points for each owner, must equal number in design
-##   'high' = c('BLM' = 2,
-##              'E' = 2,
-##              'M' = 2,
-##              'STATE' = 2,
-##              'USFS' = 2),
-##   'med' = c('BLM' = 2,
-##             'E' = 2,
-##             'M' = 2,
-##             'STATE' = 2,
-##             'USFS' = 2),
-##   'low' = c('BLM' = 2,
-##             'E' = 2,
-##             'M' = 2,
-##             'STATE' = 2,
-##             'USFS' = 2)
-## )
-
-
-
-
-claremont_design <- c( #choose the number of points in each firesev category
-  'highC' = 10,
-  'medC' = 10
-  ## 'lowC' = 10
+claremont_design <- c( # target 11
+  'highC' = 3, ## 2 target + 1 extra (not enough area for more)
+  'medC' = 3, ## 2 target + 1 extra (not enough area for more)
+  'highPUBLIC' = 4,  ## already have 3 high
+  'medPUBLIC' = 4 ## already have 3 medium
 )
 
-## claremont_caty <- list( #choose the number of points for each owner, must equal number in design (in legacy some sites are NA for owner)
-##     'high' = c('C' = 10,
-##                "NoData" = 0),
-##     'med' = c('C' = 10,
-##               "NoData" = 0),
-##     'low' = c('C' = 10,
-##               "NoData" = 0)
+## riverside_design <- c(
+##     'highPUBLIC' = 2,
+##     'medPUBLIC' = 2,
+##     'highE' = 4,
+##     'medE' = 2,
+##     'highM' = 4,
+##     'medM' = 2
 ## )
 
-
-riverside_design <- c( #choose the number of points in each firesev category
-    'highBLM' = 4,
-    'medBLM' = 2,
-    ## 'lowBLM' = 2,
-    'highE' = 4,
-    'medE' = 2,
-    ## 'lowE' = 2,
-    'highM' = 4,
-    'medM' = 2,
-    ## 'lowM' = 2,
-    ## 'highSTATE' = 2,
-    'medSTATE' = 2,
-    ## 'lowSTATE' = 2,
-    'highUSFS' = 4,
-    'medUSFS' = 2
-    ## 'lowUSFS' = 2
+holiday_design <- c( # target 36
+    'highPUBLIC' = 10, ## all new  + 2 extra
+    'medPUBLIC' = 2, ## all new
+    'lowPUBLIC' = 2, ## all new
+    'highT' = 6, ## all new
+    'medT' = 2, ## all new
+    ## 'highU' = 4, ## all new
+    ## 'medU' = 2, ## all new
+    'highM' = 10, ## already have 3 + 8 + 2 extra
+    'medM' = 4, ## already have
+    'lowM' = 2 ## already have (could drop?)
+    ## 'unburnedM' = 5 ## already have ##
+    ## (just doing 2)
 )
 
-## riverside_caty <- list( #choose the number of points for each owner, must equal number in design
-##   'high' = c('BLM' = 2,
-##              'E' = 2,
-##              'M' = 2,
-##              'STATE' = 2,
-##              'USFS' = 2),
-##   'med' = c('BLM' = 2,
-##             'E' = 2,
-##             'M' = 2,
-##             'STATE' = 2,
-##             'USFS' = 2),
-##   'low' = c('BLM' = 2,
-##             'E' = 2,
-##             'M' = 2,
-##             'STATE' = 2,
-##             'USFS' = 2)
-## )
 
-holiday_design <- c( #choose the number of points in each firesev category
-    'highBLM' = 4,
-    'medBLM' = 2,
-    ## 'lowBLM' = 2,
-    'highT' = 4,
-    'medT' = 2,
-    ## 'lowT' = 2,
-    'highM' = 4,
-    'medM' = 2,
-    ## 'lowM' = 2,
-    'highSTATE' = 4,
-    'medSTATE' = 2,
-    ## 'lowSTATE' = 2,
-    'highUSFS' = 4,
-    'medUSFS' = 2,
-    ## 'lowUSFS' = 2,
-    'highU' = 4,
-    'medU' = 2
-    ## 'lowU' = 2
+dixie_design <- c( # target 24,
+    'highC' = 5, ## have 2 + 2 + 1 extra
+    'medC' = 6, ## have 6
+    'highQ' = 5, # all new + 1 extra
+    'medQ' = 2, ## have 1 + 1 new
+    'highPUBLIC' = 5, ## all new + 1 extra
+    'medPUBLIC' = 2 # old 1 + 1 new
+    ## 'unburnedC' = 6 ## already have ##
+    ## choose 2
 )
-
-## holiday_caty <- list( #choose the number of points for each owner, must equal number in design
-##   'high' = c('BLM' = 2,
-##              'T' = 2,
-##              'M' = 2,
-##              'U' = 2,
-##              'STATE' = 2,
-##              'USFS' = 2),
-##   'med' = c('BLM' = 2,
-##             'T' = 2,
-##             'M' = 2,
-##             'U' = 2,
-##             'STATE' = 2,
-##             'USFS' = 2),
-##   'low' = c('BLM' = 2,
-##             'T' = 2,
-##             'M' = 2,
-##             'U' = 2,
-##             'STATE' = 2,
-##             'USFS' = 2)
-## )
-
-
-dixie_design <- c( #choose the number of points in each firesev category
-    'highC' = 10,
-    'medC' = 5,
-    ## 'lowC' = 5,
-    'highQ' = 10,
-    'medQ' = 5
-    ## 'lowQ' = 5
-    )
-
-## dixie_caty <- list( #choose the number of points for each owner, must equal number in design
-##   'high' = c('C' = 5,
-##              'Q' = 5),
-##   'med' = c('C' = 5,
-##             'Q' = 5),
-##   'low' = c('C' = 5,
-##             'Q' = 5)
-## )

@@ -1,5 +1,7 @@
 rm(list=ls())
-set.seed(9)
+
+set.seed(1234567890)
+
 library(terra)
 library(spsurvey)
 library(tidyverse)
@@ -10,6 +12,7 @@ library(sf)
 
 ## Lauren mac pro
 setwd("/Volumes/bombus/Dropbox (University of Oregon)/")
+## setwd("~/Dropbox (University of Oregon)/")
 
 ## Jesse
 
@@ -30,6 +33,11 @@ claremont_watersheds <- c("W61Willow")
 beachie_watersheds <- c("W50Pine", "W51Molalla")
 ## there are no sites from 2021 in the riverside fire
 
+## we are treating all public land owners (USFS, BLM, STATE) are one
+## owner. We are sampling all the legacy sites fom 2021 so they are
+## included in the design. Intention is to sample high of different
+## distances, some moderate as "sources".
+
 claremont_grts <- site_select_grts(all_legacy_sites = sites_grts,
                                    watersheds= claremont_watersheds,
                                    all_fire_polygons = fire_polygons_diss,
@@ -49,7 +57,7 @@ holiday_grts <- site_select_grts(all_legacy_sites = sites_grts,
 
 
 dixie_grts <- site_select_grts(all_legacy_sites = sites_grts,
-                               watersheds= holiday_watersheds,
+                               watersheds= dixie_watersheds,
                                all_fire_polygons = fire_polygons_diss,
                                fire.name = "Dixie",
                                design_vector = dixie_design,
@@ -65,15 +73,11 @@ beachie_grts <- site_select_grts(all_legacy_sites = sites_grts,
                                  )
 
 ## not passing in legacy sites because there were none samples in 2021
-riverside_grts <- site_select_grts(all_fire_polygons = fire_polygons_diss,
-                                   fire.name = "Riverside",
-                                   design_vector = riverside_design,
-                                   save.dir  = grts.save.dir,
-                                   all_legacy_sites=NULL,
-                                   watersheds=NULL)
+## riverside_grts <- site_select_grts(all_fire_polygons = fire_polygons_diss,
+##                                    fire.name = "Riverside",
+##                                    design_vector = riverside_design,
+##                                    save.dir  = grts.save.dir,
+##                                    all_legacy_sites=NULL,
+##                                    watersheds=NULL)
 
-
-
-
-
-
+source('../pnw_survey/calc_landscape_mets.R')
