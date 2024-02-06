@@ -1,0 +1,158 @@
+################################################################################
+#function: calculate_lsm_for_buffers_and_sites
+#
+#This function calculates pyrodiversity metrics for a given fire and sites of
+#interest within the fire. The pyrodiversity metrics are calculated for each
+#buffer of interest around each site using the landscapemetrics package in R.
+#The function first loads the raw raster file and reclassifies it based on severity
+#categories. Then, it loads the point data as an sf object and creates buffers
+#around the sites of interest. Next, it crops the raster file to each buffer
+#extent and calculates the chosen pyrodiversity metrics for each buffer.
+#Finally, it saves the resulting metrics as a CSV file in the specified directory.
+#
+################################################################################
+
+calculate_lsm_for_buffers_and_sites <- function(fire_name, #A character string indicating the name of the fire for which the metrics are being calculated.
+                                                pre_fire_raster, #The file name of a raster file that contains information about the prefire nbr. The raster file is loaded as a terra object.
+                                                dnbr_fire_raster, #The file name of a raster file that contains information about the postfire nbr. The raster file is loaded as a terra object.
+                                                fire_site_points, #The file name of a shapefile that contains information about sites of interest within the fire. The shapefile is loaded as an sf object.
+                                                buffer_sizes, #A numeric vector indicating the buffer sizes (in meters) to be used for the analysis.
+                                                chosen_metrics #A character vector specifying the pyrodiversity metrics to be calculated for each buffer and site. These metrics are calculated using the landscapemetrics package.
+){
+  #Load a raster file as a terra object (prefire raster_file)
+  pre_raster_file <- rast(pre_fire_raster)
+  
+  #band 4 minus band 5
+  pre_top <- lapp(sds(list(pre_raster_file[[4]], pre_raster_file[[5]])), 
+                  fun = function(r1, r2) { return( r1 - r2) })
+  
+  pre_bottom <- lapp(sds(list(pre_raster_file[[4]], pre_raster_file[[5]])), 
+                     fun = function(r1, r2) { return( r1 + r2) })
+  
+  
+  
+  #use bands 4 and 5 to calculate nbr
+  pre_raster_nbr <- pre_top/pre_bottom
+  
+  plot(pre_raster_nbr)
+  
+  
+  
+  #Load a raster file as a terra object (postfire raster_file)
+  dnbr_raster_file <- rast(dnbr_fire_raster)
+  
+  plot(dnbr_raster_file)
+  #browser()
+  #calculate relativized dnbr
+  relativized_dnbr <- (dnbr_raster_file)/(pre_raster_nbr+1.001)
+  plot(relativized_dnbr)
+  
+  
+  # Set all values less than or equal to zero to zero
+  dnbr_raster <- terra::clamp(relativized_dnbr, lower=0, upper=Inf)
+  ## Plot the dnbr raster to check it looks correct
+  plot(dnbr_raster)
+  print(ext(dnbr_raster))
+  #browser()
+  # Create a new SpatRaster with the same extent and resolution as the original raster
+  new_raster <- terra::rast(terra::ext(dnbr_raster), nrow = nrow(dnbr_raster), ncol = ncol(dnbr_raster))
+  
+  crs(new_raster) <- "+proj=utm +zone=10 +datum=NAD83"
+  
+  
+  # Load your point data as an sf object
+  sp.points <- st_read(fire_site_points)
+  
+  # If the CRS values are different, transform one of them to match the other
+  if (st_crs(sp.points) != crs(pre_raster_file)) {
+    sp.points <- st_transform(sp.points, crs(pre_raster_file))
+  }
+  
+  print(ext(sp.points))
+  
+  extracted.sev <- terra::extract(dnbr_raster, vect(sp.points)) %>%
+    select(-ID)
+  
+  sp.points$ContExtractedSeverity <- extracted.sev
+  
+  # Reclassify the raster based on multiple boolean statements
+  #these cutoffs are from Drivers of burn severity in the northern Cascade Range, Washington, USA 
+  #chrome-extension://efaidnbmnnnibpcajpcglclefindmkaj/https://www.fs.usda.gov/pnw/fera/publications/fulltext/cansler2011_thesis.pdf
+  new_raster[] <- ifelse(dnbr_raster[] < 69, 1, #unburned
+                         ifelse(dnbr_raster[] < 316, 2, # low severity
+                                ifelse(dnbr_raster[] < 641, 3, #moderate severity
+                                       4))) #high severity
+  
+  cat.extracted.sev <- terra::extract(new_raster, vect(sp.points)) %>%
+    select(-ID)
+  
+  sp.points$CatExtractedSeverity <- cat.extracted.sev
+  
+  # Plot the new raster to check it looks correct
+  plot(new_raster)
+  crs(new_raster) <- "+proj=utm +zone=10 +datum=NAD83"
+  
+  
+  
+  #create buffers
+  buffer_widths <- (buffer_sizes) ###DOUBLE CHECK THIS IS IN METERS AND NOT RASTER UNITS SOMEHOW?
+  buffers <- list()
+  
+  for (i in seq_along(buffer_widths)) {
+    buffer_list <- list()
+    for (j in seq_along(unique(sp.points$Stand))) {
+      site_buffer <- st_buffer(sp.points[sp.points$Stand == j,], buffer_widths[i])
+      buffer_list[[j]] <- site_buffer
+    }
+    buffers[[i]] <- buffer_list
+  }
+  
+  # create a list of buffer rasters
+  buffer_rasters <- list()
+  
+  for (i in seq_along(buffer_widths)) {
+    buffer_list <- list()
+    for (j in unique(sp.points$Stand)) {
+      # create buffer for current site
+      site_buffer <- st_buffer(sp.points[sp.points$Stand == j,], buffer_widths[i])
+      # crop the raster to the buffer extent
+      site_raster <- crop(new_raster, ext(site_buffer))
+      # add site raster to buffer list
+      buffer_list[[j]] <- site_raster
+    }
+    # add buffer list for current buffer width to buffer_rasters
+    buffer_rasters[[i]] <- buffer_list
+  }
+  
+  # Calculate local pyrodiversity metrics for each site in each buffer
+  metric_names <- c(chosen_metrics)
+  
+  # Initialize an empty list to store the results
+  metric_results <- list()
+  
+  for (i in seq_along(buffer_widths)) {
+    metric_results[[i]] <- list()
+    for (j in seq_along(unique(sp.points$Stand))) {
+      # Extract the buffer for the current site from the list of buffer rasters
+      buffer_raster <- buffer_rasters[[i]][[j]]
+      # Calculate landscape metrics for the current buffer
+      metric_result <- landscapemetrics::calculate_lsm(buffer_raster, what = metric_names)
+      # Add additional columns to the metric result data frame
+      metric_result$Buffer <- buffer_widths[i]
+      metric_result$Stand <- sp.points$Stand[j]
+      ext.sev <- sp.points$CatExtractedSeverity[j,]
+      metric_result$CatExtractedSeverity <- ext.sev
+      ext.sev.cont <- sp.points$ContExtractedSeverity[j,]
+      metric_result$ContExtractedSeverity <- ext.sev.cont
+      # Map the values of the class column to severity levels
+      metric_result$Severity <- ifelse(metric_result$class == 1, "Unburned",
+                                       ifelse(metric_result$class == 2, "Low",
+                                              ifelse(metric_result$class == 3, "Moderate", "High")))
+      metric_results[[i]][[j]] <- metric_result
+      print(paste('site metrics calculated for stand', j, 'buffer', i))
+    }
+    print(paste('metrics calculated for all sites in buffer', i))
+    #browser()
+  }
+  return(metric_results)
+}
